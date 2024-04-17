@@ -1,0 +1,286 @@
+// Call fileread after all items are processed
+        // Assuming responseData.data is an array of items
+        // Promise.all(responseData.data.map(async (item) => {
+        //     try {
+        //         // Call main for each item
+        //         await main(item.name);
+        //     } catch (error) {
+        //         console.error('Error:', error);
+        //         throw error; // Rethrow error to propagate it up
+        //     }
+        // })).then(() => {
+        //     // Once all items are processed, call fileread
+        //     fileread();
+        // }).catch(error => {
+        //     console.error('Error:', error);
+        // });
+
+        // // Function to download file and read files
+        // async function main(item) {
+        //     try {
+        //         let extractedData = [];
+
+        //         await parq(item); // Download file
+
+        //         for (const item of responseData.data) {
+        //             const records = await parq2(item.name);
+        //             extractedData.push(...records);
+        //         }
+
+        //     } catch (error) {
+        //         console.error('Error:', error);
+        //         throw error; // Rethrow error to propagate it up
+        //     }
+        // }
+
+
+        // Function to read files
+        // function fileread() {
+        //     const directoryPath = './parquet';
+        //     fs.readdir(directoryPath, (err, files) => {
+        //         if (err) {
+        //             console.error('Error reading directory:', err);
+        //             return;
+        //         }
+
+        //         files.forEach(file => {
+        //             const filePath = path.join(directoryPath, file);
+        //             fs.stat(filePath, (err, stats) => {
+        //                 if (err) {
+        //                     console.error('Error getting file stats:', err);
+        //                     return;
+        //                 }
+
+        //                 if (stats.isFile()) {
+        //                     console.log('File:', filePath);
+        //                     // Do something with the file
+        //                 } else if (stats.isDirectory()) {
+        //                     console.log('Directory:', filePath);
+        //                 }
+        //             });
+        //         });
+        //     });
+        // }
+
+
+
+        // function fileread() {
+
+        //     const directoryPath = './parquet';
+
+        //     // Read the contents of the directory
+        //     fs.readdir(directoryPath, (err, files) => {
+        //         if (err) {
+        //             console.error('Error reading directory:', err);
+        //             return;
+        //         }
+
+        //         // Loop through each file in the directory
+        //         files.forEach(file => {
+        //             // Construct the full path to the file
+        //             const filePath = path.join(directoryPath, file);
+
+        //             // Check if it's a file or directory
+        //             fs.stat(filePath, (err, stats) => {
+        //                 if (err) {
+        //                     console.error('Error getting file stats:', err);
+        //                     return;
+        //                 }
+
+        //                 if (stats.isFile()) {
+        //                     console.log('File:', filePath);
+        //                     // Do something with the file
+        //                 } else if (stats.isDirectory()) {
+        //                     console.log('Directory:', filePath);
+        //                     // Recursively loop through directories
+        //                     // You can implement recursion here if you want to explore subdirectories
+        //                 }
+        //             });
+        //         });
+        //     })
+        // }
+
+
+        // async function parq(item) {
+//     return new Promise((resolve, reject) => {
+//         try {
+
+//             const headers = {
+//                 'Accept': '*/*',
+//                 'Content-Type': 'application/json',
+//                 'Authorization': `Bearer ${ACCESS_TOKEN}`,
+//                 'x-api-key': API_KEY,
+//                 'x-gw-ims-org-id': IMS_ORG,
+//                 'x-sandbox-name': SANDBOX_NAME,
+//                 'responseType': 'arraybuffer'
+//             };
+
+
+//             const options = {
+//                 headers: headers // assuming headers is defined elsewhere
+//             };
+
+//             const dataSetFileId = "01HV6307M033VXKXXHZRC79KT9-DE1"
+//             const url = `https://platform.adobe.io/data/foundation/export/files/${dataSetFileId}?path=${item}`;
+//             const directory = './parquet';
+
+//             if (!fs.existsSync(directory)) {
+//                 fs.mkdirSync(directory, { recursive: true });
+//             }
+
+//             const file = fs.createWriteStream(path.join(directory, item));
+
+//             https.get(url, options, (response) => {
+//                 if (response.statusCode === 200) {
+//                     response.pipe(file);
+//                     response.on('end', () => {
+//                         file.close();
+//                         console.log('File saved successfully.');
+//                         resolve(); // resolve the promise when download is complete
+//                     });
+//                 } else {
+//                     console.error('Failed to download file. Status code:', response.statusCode);
+//                     reject(new Error(`Failed to download file. Status code: ${response.statusCode}`));
+//                 }
+//             }).on('error', (err) => {
+//                 console.error('Error downloading file:', err);
+//                 reject(err);
+//             });
+
+//         } catch (error) {
+//             console.error(error);
+//             reject(error);
+//         }
+//     });
+// }
+
+
+
+
+
+// function fileread(res) {
+
+//     const directoryPath = './parquet';
+//     let data = [];
+
+//     // Read the contents of the directory
+//     fs.readdir(directoryPath, (err, files) => {
+//         if (err) {
+//             console.error('Error reading directory:', err);
+//             return;
+//         }
+//         if (files.length === 0) {
+//             console.log('Directory is empty');
+//             return;
+//         }
+
+//         let count = files.length;
+//         // Loop through each file in the directory
+//         files.forEach(file => {
+//             // Construct the full path to the file
+//             const filePath = path.join(directoryPath, file);
+
+//             // Check if it's a file or directory
+//             fs.stat(filePath, (err, stats) => {
+//                 if (err) {
+//                     console.error('Error getting file stats:', err);
+//                     return;
+//                 }
+
+//                 if (stats.isFile()) {
+//                     parq2(file).then(records => {
+//                         data.push(...records);
+//                         count--;
+//                         if (count === 0) {
+//                             // All files processed, send response
+//                             res.json(data);
+//                         }
+//                     }).catch(error => {
+//                         console.error(error);
+//                         res.status(500).json({ error: 'Internal Server Error' });
+//                     });
+//                 } else if (stats.isDirectory()) {
+//                     console.log('Directory:', filePath);
+//                     // Recursively loop through directories
+//                     // You can implement recursion here if you want to explore subdirectories
+//                 }
+//             });
+//         });
+//     })
+// }
+
+
+
+// async function parq2(item) {
+//     try {
+//         const reader = await ParquetReader.openFile(`./parquet/${item}`);
+//         const cursor = reader.getCursor();
+//         let records = [];
+//         let record;
+//         while (record = await cursor.next()) {
+
+//             //console.log(record.segmentMembership);
+//             records.push(record.segmentMembership);
+//         }
+//         return records;
+//     } catch (error) {
+//         console.error(error);
+//         throw error;
+//     }
+// }
+
+
+
+ // responseData.forEach(async item => {
+        //      parq(item.name)
+        // });
+
+
+        // async function processItems() {
+        //     const promises = responseData.map(async item => {
+        //         return  parq(item.name);
+        //     });
+
+        //     await Promise.all(promises);
+
+        //     // This code will execute after all parq calls are finished
+        //     // Call your function here
+        //     // functionName();
+        // }
+
+        // processItems().then(() => {
+        //     fileread();
+        // });
+
+
+        // Assuming responseData.data is an array of items
+        // Promise.all(responseData.map(async (item) => {
+        //     try {
+        //         // Call main for each item
+        //         await parq(item.name);
+        //     } catch (error) {
+        //         console.error('Error:', error);
+        //         throw error; // Rethrow error to propagate it up
+        //     }
+        // })).then(() => {
+        //     // Once all items are processed, call fileread
+        //     setTimeout(() => {
+        //         fileread(res);
+        //     }, 5000);
+        // }).catch(error => {
+        //     console.error('Error:', error);
+        // });
+
+        // Function to download file and read files
+        // async function main(item) {
+        //     try {
+
+
+        //         await parq(item); // Download file
+
+
+        //     } catch (error) {
+        //         console.error('Error:', error);
+        //         throw error; // Rethrow error to propagate it up
+        //     }
+        // }
